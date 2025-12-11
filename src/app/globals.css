@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "locomotive-scroll/dist/locomotive-scroll.css";
+
 
 :root {
   --background: #ffffff;
@@ -22,5 +24,58 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+body {
+  color: #212121 !important;
+}
+
+/* ----------------------------------------- */
+/* FIX GLOBAL OVERRIDE BREAKING CODROPS CSS  */
+/* ----------------------------------------- */
+
+.link--leda,
+.link--leda span,
+.link--leda::before,
+.link--leda::after {
+  color: #000 !important;
+  --tw-text-opacity: 1 !important;
+}
+
+.button--telesto,
+.button--telesto span,
+.button--telesto > span > span {
+  color: #000 !important;
+}
+
+/* During hover */
+.button--telesto:hover > span > span {
+  color: #fff !important;
+}
+
+.services-scroll-zone {
+  overscroll-behavior: contain; /* BLOCKS MOMENTUM ONLY HERE */
+  scroll-behavior: auto;         /* stops smooth easing in this section only */
+}
+
+@keyframes gradientMoveDiagonal {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-gradient {
+  background-size: 300% 300%;
+  animation: gradientMoveDiagonal 6s ease-in-out infinite;
+}
+
+

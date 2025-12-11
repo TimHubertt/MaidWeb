@@ -1,0 +1,105 @@
+.link--leda {
+  --leda-color: #564d4d;
+  --leda-accent: #db0000;
+  
+  position: relative;
+  display: inline-block;
+  
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.2;
+  
+  color: var(--leda-color);
+  text-decoration: none;
+  
+  overflow: hidden;
+  cursor: pointer;
+  
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Underline */
+.link--leda::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  
+  width: 100%;
+  height: 2px;
+  
+  background: var(--leda-accent);
+  
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  opacity: 0;
+}
+
+/* Sliding overlay text */
+.link--leda::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  
+  width: 100%;
+  color: var(--leda-accent);
+  
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  white-space: nowrap;
+}
+
+/* Original text */
+.link--leda span {
+  display: inline-block;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* HOVER ANIMATIONS */
+.link--leda:hover::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.link--leda:hover span {
+  transform: translateX(-120%);
+}
+
+.link--leda:hover::after {
+  transform: translateX(0%);
+}
+
+/* MOBILE MENU LINK (NO ANIMATION) */
+.link--leda-mobile {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500;
+  font-size: 1.125rem;
+  
+  color: var(--leda-color);
+  text-decoration: none;
+  
+  display: block;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+  
+  -webkit-tap-highlight-color: transparent;
+}
+
+.link--leda-mobile:hover,
+.link--leda-mobile:active {
+  color: var(--leda-accent);
+  padding-left: 0.5rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .link--leda {
+    font-size: 0.9375rem;
+  }
+}
+
+    
