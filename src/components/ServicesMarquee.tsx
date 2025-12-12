@@ -67,35 +67,58 @@ export default function ServicesMarquee() {
   )
 }
 
-/* ==================== DESKTOP – RED FINAL SCREEN FADES OUT WHEN NEXT SECTION STARTS ==================== */
+/* ==================== DESKTOP VERSION - FIXED GHOST BUTTON ISSUE ==================== */
 function DesktopVersion() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+  
+  // Track scroll progress value for conditional logic
+  const [scrollProgress, setScrollProgress] = useState(0)
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end 250%'],
   })
 
   useEffect(() => {
-  window.scrollTo(0, 0);
-}, []);
-
+    setMounted(true)
+  }, [])
 
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 80, damping: 65 })
   const x = useTransform(smoothProgress, [0, 0.99], [0, -432 * 7])
 
-  // Appear
-  const bgOpacity = useTransform(smoothProgress, [0.72, 0.88], [0, 1])
-  const contentOpacity = useTransform(smoothProgress, [0.78, 0.92], [0, 1])
-  const contentY = useTransform(smoothProgress, [0.78, 0.92], [60, 0])
+  // Animation values
+  const bgOpacity = useTransform(smoothProgress, [0.72, 0.85], [0, 1])
+  const contentOpacity = useTransform(smoothProgress, [0.75, 0.88], [0, 1])
+  const contentY = useTransform(smoothProgress, [0.75, 0.88], [60, 0])
+  const fadeOut = useTransform(smoothProgress, [0.90, 0.96], [1, 0])
+  
+  // Combined opacity for smooth fade - MUST be declared at top level
+  const finalOpacity = useTransform(
+    [bgOpacity, fadeOut],
+    ([bg, fade]) => Math.min(bg as number, fade as number)
+  )
+  
+  // Combined content opacity - MUST be declared at top level
+  const finalContentOpacity = useTransform(
+    [contentOpacity, fadeOut],
+    ([c, f]) => Math.min(c as number, f as number)
+  )
 
-  // Fade out when next section (Maids) starts entering
-  const fadeOut = useTransform(smoothProgress, [0.96, 1], [1, 0], { clamp: true })
+  // Track scroll progress for unmounting logic
+  useEffect(() => {
+    const unsubscribe = smoothProgress.on('change', (latest) => {
+      setScrollProgress(latest)
+    })
+    return unsubscribe
+  }, [smoothProgress])
 
   return (
-    <section ref={containerRef} className="relative bg-white services-scroll-zone">
-      <div className="absolute inset-0 bg-white z-0">
-
-      </div>
+    <section
+      id="services"
+      ref={containerRef} 
+      className="relative bg-white services-scroll-zone"
+    >
       <div className="h-screen sticky top-0 overflow-hidden bg-white flex flex-col">
         <div className="flex items-center justify-center px-8 pt-12 pb-6 flex-shrink-0">
           <div className="text-center max-w-4xl">
@@ -129,73 +152,78 @@ function DesktopVersion() {
         </div>
       </div>
 
-      {/* RED BACKGROUND – fades out at 92% */}
-      <motion.div
-        style={{ opacity: useTransform([bgOpacity, fadeOut], ([a, b]) => Math.min(a as number, b as number)) }}
-        className="fixed inset-0 bg-[#db0000] z-40 pointer-events-none"
-      />
+      {/* RED SCREEN - Render in range, control with opacity only */}
+      {mounted && scrollProgress >= 0.70 && scrollProgress <= 0.98 && (
+        <>
+          {/* RED BACKGROUND */}
+          <motion.div
+            style={{ opacity: finalOpacity }}
+            className="fixed inset-0 bg-[#db0000] z-40"
+            animate={{ pointerEvents: 'none' }}
+          />
 
-      {/* TEXT + BUTTON – also fade out at 92% */}
-      <motion.div
-        style={{
-          opacity: useTransform([contentOpacity, fadeOut], ([a, b]) => Math.min(a as number, b as number)),
-          y: contentY,
-        }}
-        className="fixed inset-0 z-50 pointer-events-none"
-      >
-        <div className="h-screen flex items-center pl-4 sm:pl-12 md:pl-20 lg:pl-32 xl:pl-48">
-          <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-tight">
-            Ready to Experience
-            <br />
-            <span
-              className="block mt-3 bg-clip-text text-transparent
-                 bg-gradient-to-r from-white via-gray-200 to-red-100
-                 [webkit-background-clip:text] [webkit-text-fill-color:transparent]"
-              style={{
-                backgroundImage: 'linear-gradient(to right, #ffffff, #e5e7eb, #fca5a5)',
-              }}
-            >
-              <span className="text-6xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[8rem] font-black">
-                the Difference?
-              </span>
-            </span>
-          </h1>
-        </div>
-
-        <div className="absolute bottom-12 right-12 md:bottom-20 md:right-20 lg:bottom-24 lg:right-32 pointer-events-auto">
-          <motion.a
-            href="https://wa.me/916305339775?text=Hi%20Zaneta%2C%20I'm%20looking%20for%20help." 
-            target="_blank"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(255,255,255,0.4)" }}
-            whileTap={{ scale: 0.98 }}
-            className="px-12 py-6 bg-white text-[#db0000] font-bold text-xl md:text-2xl rounded-full shadow-2xl flex items-center gap-4 tracking-wide hover:bg-gray-50 transition-all"
+          {/* TEXT + BUTTON */}
+          <motion.div
+            style={{ 
+              opacity: finalContentOpacity,
+              y: contentY 
+            }}
+            className="fixed inset-0 z-50"
+            animate={{ pointerEvents: 'none' }}
           >
-            Book A Maid
-            <ArrowRight size={32} strokeWidth={2.5} />
-          </motion.a>
-        </div>
-      </motion.div>
+            <div className="h-screen flex items-center pl-4 sm:pl-12 md:pl-20 lg:pl-32 xl:pl-48 pointer-events-none">
+              <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-tight">
+                Ready to Experience
+                <br />
+                <span
+                  className="block mt-3 bg-clip-text text-transparent
+                     bg-gradient-to-r from-white via-gray-200 to-red-100"
+                  style={{
+                    backgroundImage: 'linear-gradient(to right, #ffffff, #e5e7eb, #fca5a5)',
+                  }}
+                >
+                  <span className="text-6xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[8rem] font-black">
+                    the Difference?
+                  </span>
+                </span>
+              </h1>
+            </div>
+
+            {/* Button - only clickable in active range */}
+            {scrollProgress >= 0.75 && scrollProgress <= 0.92 && (
+              <div className="absolute bottom-12 right-12 md:bottom-20 md:right-20 lg:bottom-24 lg:right-32 pointer-events-auto">
+                <motion.a
+                  href="https://wa.me/916305339775?text=Hi%20Zaneta%2C%20I'm%20looking%20for%20help." 
+                  target="_blank"
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(255,255,255,0.4)" }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-12 py-6 bg-white text-[#db0000] font-bold text-xl md:text-2xl rounded-full shadow-2xl flex items-center gap-4 tracking-wide hover:bg-gray-50 transition-all"
+                >
+                  Book A Maid
+                  <ArrowRight size={32} strokeWidth={2.5} />
+                </motion.a>
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
 
       <div className="h-[450vh] bg-white" />
     </section>
   )
 }
 
-
-/* ==================== MOBILE – UNCHANGED & WORKING ==================== */
-/* ==================== MOBILE VERSION — Red screen only on button click ==================== */
+/* ==================== MOBILE VERSION ==================== */
 function MobileVersion() {
   const dragX = useMotionValue(0);
   const controls = useAnimationControls();
   const CARD_WIDTH = 312;
 
-  // Only show red screen when user clicks "Get Started" — never on load
   const [showTakeover, setShowTakeover] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Removed the auto-show logic completely
   }, []);
 
   const handleDragEnd = () => {
@@ -210,67 +238,59 @@ function MobileVersion() {
 
   return (
     <section className="relative bg-white overflow-hidden">
-      {/* RED TAKEOVER SCREEN – Only shows on button click */}
-      {mounted && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: showTakeover ? 1 : 0 }}
-          transition={{ duration: 0.6 }}
-          className={`fixed inset-0 bg-[#db0000] z-[70] ${
-            showTakeover ? "pointer-events-auto" : "pointer-events-none"
-          }`}
-        />
-      )}
-
-      {/* TAKEOVER CONTENT */}
-      {mounted && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ 
-            opacity: showTakeover ? 1 : 0, 
-            scale: showTakeover ? 1 : 0.9 
-          }}
-          transition={{ duration: 0.7, delay: showTakeover ? 0.2 : 0 }}
-          className="fixed inset-0 z-[80] flex flex-col justify-center items-center px-6 text-center"
-          style={{ pointerEvents: showTakeover ? "auto" : "none" }}
-        >
-          <motion.h1
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: showTakeover ? 0 : 30, opacity: showTakeover ? 1 : 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-white text-4xl sm:text-5xl md:text-6xl font-black leading-tight"
-          >
-            Ready to Experience
-            <br />
-            <span className="block text-5xl sm:text-6xl md:text-7xl mt-2">
-              the Difference?
-            </span>
-          </motion.h1>
-
-          <motion.a
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: showTakeover ? 0 : 40, opacity: showTakeover ? 1 : 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            href="https://wa.me/916305339775?text=Hi%20Zaneta%2C%20I'm%20looking%20for%20help."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-10 px-12 py-5 bg-white text-[#db0000] rounded-full font-bold text-xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300"
-          >
-            Book A Maid
-          </motion.a>
-
-          <motion.button
+      {/* Conditional rendering - only exists when showTakeover is true */}
+      {mounted && showTakeover && (
+        <>
+          <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: showTakeover ? 1 : 0 }}
-            onClick={() => setShowTakeover(false)}
-            className="absolute top-8 right-8 text-white text-4xl font-light hover:scale-110 transition"
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="fixed inset-0 bg-[#db0000] z-[70]"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="fixed inset-0 z-[80] flex flex-col justify-center items-center px-6 text-center"
           >
-            ×
-          </motion.button>
-        </motion.div>
+            <motion.h1
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="text-white text-4xl sm:text-5xl md:text-6xl font-black leading-tight"
+            >
+              Ready to Experience
+              <br />
+              <span className="block text-5xl sm:text-6xl md:text-7xl mt-2">
+                the Difference?
+              </span>
+            </motion.h1>
+
+            <motion.a
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              href="https://wa.me/916305339775?text=Hi%20Zaneta%2C%20I'm%20looking%20for%20help."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-10 px-12 py-5 bg-white text-[#db0000] rounded-full font-bold text-xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300"
+            >
+              Book A Maid
+            </motion.a>
+
+            <button
+              onClick={() => setShowTakeover(false)}
+              className="absolute top-8 right-8 text-white text-4xl font-light hover:scale-110 transition"
+            >
+              ×
+            </button>
+          </motion.div>
+        </>
       )}
 
-      {/* Rest of your mobile layout — unchanged */}
       <div className="text-center pt-12 pb-8 px-6 relative z-10">
         <span className="inline-block px-6 py-2 rounded-full bg-red-500/10 text-red-600 font-bold text-sm mb-3">
           OUR SERVICES
@@ -289,7 +309,7 @@ function MobileVersion() {
             left: -CARD_WIDTH * (servicesList.length - 1),
             right: 0,
           }}
-          dragElastic={0.15}
+          dragElastic={0.8}
           style={{ x: dragX }}
           animate={controls}
           onDragEnd={handleDragEnd}
@@ -300,7 +320,6 @@ function MobileVersion() {
         </motion.div>
       </div>
 
-      {/* GET STARTED BUTTON — This triggers the red screen */}
       <div className="text-center py-8 px-6 relative z-10">
         <button
           onClick={() => setShowTakeover(true)}   
@@ -313,8 +332,7 @@ function MobileVersion() {
   );
 }
 
-
-/* ==================== SERVICE CARD – UNCHANGED & BEAUTIFUL ==================== */
+/* ==================== SERVICE CARD ==================== */
 function ServiceCard({ image, title, desc, info, gradient, isMobile = false }: any) {
   const [flipped, setFlipped] = useState(false)
 

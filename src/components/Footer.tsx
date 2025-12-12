@@ -9,7 +9,7 @@ export default function Footer() {
   return (
     <footer
     id="contact"
-    className="relative overflow-hidden bg-gradient-to-b from-[#f8f9a4] via-[#fff5f5] to-[#ffe5e5] text-black pt-20 pb-6">
+    className="relative overflow-hidden bg-gradient-to-b from-[#feffc7] via-[#fff5f5] to-[#ffe5e5] text-black pt-20 pb-6">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
 
         {/* TOP SECTION — BRAND MESSAGE */}
@@ -102,15 +102,17 @@ export default function Footer() {
 
     <p className="text-gray-800 leading-relaxed">
       Zaneta Services Pvt Ltd,<br />
-      123 Main Street,<br />
-      Hyderabad,<br />
-      India
+      Flat No. 203, Gautami Apartment<br />
+      Gautam Nagar,<br />
+      Malkajgiri <br/>
+      Telangana, India - 500047
+
     </p>
 
     <a
-      href="https://www.google.com/maps/search/?api=1&query=Hyderabad+India"
+      href="https://www.google.com/maps/search/?api=1&query=Gauthami+Apartments,+173+4,+Pilot+Raj+Kumar+Rd,+Indira+Nehru+Nagar,+Gautham+Nagar,+Malkajgiri,+Secunderabad,+Telangana+500047"
       target="_blank"
-      className="mt-3 text-[#db0000] px-3 py-2 font-bold hover:underline"
+      className=" text-[#db0000] mt-2 font-bold hover:underline"
     >
       Get Directions →
     </a>

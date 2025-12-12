@@ -83,6 +83,10 @@ export default function Navbar() {
                 <Link href="#benefits" className="link--leda" data-text="Benefits">
                     <span>Benefits</span>
                 </Link>
+
+                <Link href="#services" className="link--leda" data-text="Services">
+                    <span>Services</span>
+                </Link>
                 
                 <Link href="#contact" className="link--leda" data-text="Contact">
                     <span>Contact</span>
@@ -147,7 +151,15 @@ export default function Navbar() {
                 Benefits
                 </Link>
                 <div className="border-t border-black/10" />
-                              
+
+                  <Link 
+                  href="#services" 
+                  className="link--leda-mobile py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                Services
+                </Link>
+                <div className="border-t border-black/10" />             
                 
                 <Link 
                   href="#contact" 
