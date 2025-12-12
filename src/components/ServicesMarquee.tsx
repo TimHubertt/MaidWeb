@@ -185,66 +185,92 @@ function DesktopVersion() {
 /* ==================== MOBILE – UNCHANGED & WORKING ==================== */
 /* ==================== MOBILE VERSION — Red screen only on button click ==================== */
 function MobileVersion() {
-  const dragX = useMotionValue(0)
-  const controls = useAnimationControls()
-  const CARD_WIDTH = 312
+  const dragX = useMotionValue(0);
+  const controls = useAnimationControls();
+  const CARD_WIDTH = 312;
 
-  const [showTakeover, setShowTakeover] = useState(false)
+  // Only show red screen when user clicks "Get Started" — never on load
+  const [showTakeover, setShowTakeover] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Removed the auto-show logic completely
+  }, []);
 
   const handleDragEnd = () => {
-    const current = dragX.get()
-    let index = Math.round(-current / CARD_WIDTH)
-    index = Math.max(0, Math.min(index, servicesList.length - 1))
-    const snapTo = -index * CARD_WIDTH
+    const current = dragX.get();
+    let index = Math.round(-current / CARD_WIDTH);
+    index = Math.max(0, Math.min(index, servicesList.length - 1));
     controls.start({
-      x: snapTo,
-      transition: { type: "spring", stiffness: 300, damping: 32 }
-    })
-  }
+      x: -index * CARD_WIDTH,
+      transition: { type: "spring", stiffness: 300, damping: 32 },
+    });
+  };
 
   return (
     <section className="relative bg-white overflow-hidden">
+      {/* RED TAKEOVER SCREEN – Only shows on button click */}
+      {mounted && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showTakeover ? 1 : 0 }}
+          transition={{ duration: 0.6 }}
+          className={`fixed inset-0 bg-[#db0000] z-[70] ${
+            showTakeover ? "pointer-events-auto" : "pointer-events-none"
+          }`}
+        />
+      )}
 
-      {/* ================= RED TAKEOVER SCREEN ================= */}
-      <motion.div
-        animate={{ opacity: showTakeover ? 1 : 0 }}
-        transition={{ duration: 0.5 }}
-        className={`fixed inset-0 bg-[#db0000] z-[70] ${showTakeover ? "pointer-events-auto" : "pointer-events-none"}`}
-      />
-
-      {/* ================= TAKEOVER CONTENT ================= */}
-      <motion.div
-        animate={{ opacity: showTakeover ? 1 : 0, scale: showTakeover ? 1 : 0.95 }}
-        transition={{ delay: 0.1, duration: 0.5 }}
-        className="fixed inset-0 z-[80] flex flex-col justify-center items-center px-6"
-        style={{ pointerEvents: showTakeover ? "auto" : "none" }}
-      >
-        <h1 className="text-white text-4xl font-black text-center leading-tight">
-          Ready to Experience
-          <br />
-          <span className="block text-5xl mt-2">the Difference?</span>
-        </h1>
-
-        {/* BOOK A MAID BUTTON (WhatsApp) */}
-        <a
-          href="https://wa.me/916305339775?text=Hi%20Zaneta%2C%20I'm%20looking%20for%20help."
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-8 px-10 py-4 bg-white text-[#db0000] rounded-full font-bold text-lg shadow-xl"
+      {/* TAKEOVER CONTENT */}
+      {mounted && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ 
+            opacity: showTakeover ? 1 : 0, 
+            scale: showTakeover ? 1 : 0.9 
+          }}
+          transition={{ duration: 0.7, delay: showTakeover ? 0.2 : 0 }}
+          className="fixed inset-0 z-[80] flex flex-col justify-center items-center px-6 text-center"
+          style={{ pointerEvents: showTakeover ? "auto" : "none" }}
         >
-          Book A Maid →
-        </a>
+          <motion.h1
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: showTakeover ? 0 : 30, opacity: showTakeover ? 1 : 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="text-white text-4xl sm:text-5xl md:text-6xl font-black leading-tight"
+          >
+            Ready to Experience
+            <br />
+            <span className="block text-5xl sm:text-6xl md:text-7xl mt-2">
+              the Difference?
+            </span>
+          </motion.h1>
 
-        {/* CLOSE BUTTON (Top Right) */}
-        <button
-          onClick={() => setShowTakeover(false)}
-          className="absolute top-6 right-6 text-white text-3xl font-bold"
-        >
-          ×
-        </button>
-      </motion.div>
+          <motion.a
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: showTakeover ? 0 : 40, opacity: showTakeover ? 1 : 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            href="https://wa.me/916305339775?text=Hi%20Zaneta%2C%20I'm%20looking%20for%20help."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-10 px-12 py-5 bg-white text-[#db0000] rounded-full font-bold text-xl shadow-2xl hover:shadow-3xl hover:scale-105 transition-all duration-300"
+          >
+            Book A Maid
+          </motion.a>
 
-      {/* ================= NORMAL CONTENT ================= */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showTakeover ? 1 : 0 }}
+            onClick={() => setShowTakeover(false)}
+            className="absolute top-8 right-8 text-white text-4xl font-light hover:scale-110 transition"
+          >
+            ×
+          </motion.button>
+        </motion.div>
+      )}
+
+      {/* Rest of your mobile layout — unchanged */}
       <div className="text-center pt-12 pb-8 px-6 relative z-10">
         <span className="inline-block px-6 py-2 rounded-full bg-red-500/10 text-red-600 font-bold text-sm mb-3">
           OUR SERVICES
@@ -255,7 +281,6 @@ function MobileVersion() {
         </h2>
       </div>
 
-      {/* CAROUSEL */}
       <div className="flex-1 px-4 relative z-10">
         <motion.div
           className="flex gap-6"
@@ -275,17 +300,17 @@ function MobileVersion() {
         </motion.div>
       </div>
 
-      {/* BUTTON TRIGGERS TAKEOVER */}
+      {/* GET STARTED BUTTON — This triggers the red screen */}
       <div className="text-center py-8 px-6 relative z-10">
         <button
-          onClick={() => setShowTakeover(true)}
-          className="px-10 py-6 bg-red-600 text-white font-bold text-lg rounded-full shadow-xl"
+          onClick={() => setShowTakeover(true)}   
+          className="px-10 py-6 bg-red-600 text-white font-bold text-lg rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
         >
           Get Started Today
         </button>
       </div>
     </section>
-  )
+  );
 }
 
 
