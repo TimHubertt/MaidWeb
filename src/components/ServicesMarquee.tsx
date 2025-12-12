@@ -232,7 +232,7 @@ function MobileVersion() {
     index = Math.max(0, Math.min(index, servicesList.length - 1));
     controls.start({
       x: -index * CARD_WIDTH,
-      transition: { type: "spring", stiffness: 300, damping: 32 },
+      transition: { type: "spring", stiffness: 140, damping: 50, mass: 0.3},
     });
   };
 
@@ -371,7 +371,7 @@ function ServiceCard({ image, title, desc, info, gradient, isMobile = false }: a
         >
           <div className="text-center text-white">
             <h4 className="text-2xl md:text-3xl font-black mb-4 tracking-tight">
-              {title}
+              {desc}
             </h4>
             <p className="text-sm md:text-base leading-relaxed opacity-95 max-w-xs mx-auto">
               {info}
