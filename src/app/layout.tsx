@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Zaneta - Empowering Household Heroes',
-  description: 'Bringing dignity, respect, and essential benefits to domestic workers',
+  title: 'Zaneta - Best Maid Service',
+  description: 'Best Maids in Town. Trusted by Thousands of Happy Families.',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 };
 

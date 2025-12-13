@@ -134,7 +134,7 @@ export default function Navbar() {
               <div className="flex flex-col gap-4 backdrop-blur-sm">
                 
                 <Link 
-                  href="#vision" 
+                  href="#about" 
                   className="link--leda-mobile py-2"
                   onClick={() => setIsOpen(false)}
                 >
